@@ -31,6 +31,7 @@ mainnet:
 # Neo side chain RPC settings
 morph:
   endpoints: # List of websocket RPC endpoints in sidechain
+    - ws://morph-chain-rpc:30333/ws
     - ws://morph-chain:30333/ws
   validators:  # List of hex-encoded 33-byte public keys of sidechain validators to vote for at application startup
     - 02b3622bf4017bdfe317c58aed5f4c753f206b7db896046fa7d774bbc4bf7f8dc2

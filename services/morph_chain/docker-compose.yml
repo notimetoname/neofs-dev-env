@@ -20,6 +20,40 @@ services:
     - ./../../vendor/hosts:/etc/hosts
     - ./../../wallets/wallet.json:/wallets/wallet.json
 
+  neofs_morph_chain_rpc:
+    image: nspccdev/neo-go:${NEOGO_VERSION}
+    container_name: morph_chain_rpc
+    command: ["node", "--config-path", "/config", "--privnet", "--debug"]
+    domainname: ${LOCAL_DOMAIN}
+    hostname: morph-chain-rpc
+    networks:
+      chain_int:
+      internet:
+        ipv4_address: ${IPV4_PREFIX}.91
+    stop_signal: SIGKILL
+    environment:
+    - ACC=/morph_chain.gz
+    depends_on:
+    - neofs_morph_chain
+    volumes:
+    - ./../../vendor/morph_chain.gz:/morph_chain.gz
+    - ./protocol.rpc.privnet.yml:/config/protocol.privnet.yml
+    - ./../../vendor/hosts:/etc/hosts
+    - ./../../wallets/wallet.json:/wallets/wallet.json
+    healthcheck:
+      test: ["CMD-SHELL", "neo-go query committee -r http://127.0.0.1:30333 | grep 02b3622bf4017bdfe317c58aed5f4c753f206b7db896046fa7d774bbc4bf7f8dc2"]
+      interval: 2s
+      timeout: 1s
+      retries: 5
+      start_period: 10s
+
+  neofs_morph_chain_rpc_healthcheck:
+    container_name: morph_chain_rpc_healthcheck
+    image: debian:10
+    depends_on:
+      neofs_morph_chain_rpc:
+        condition: service_healthy
+
 networks:
   chain_int:
   internet:
